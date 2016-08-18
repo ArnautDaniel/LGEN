@@ -1,5 +1,5 @@
 #lang racket
-(require "LGEN-model.rkt")
+(require "model.rkt")
 ;An invoice is a
 ;Set -> String
 ;Show -> String
