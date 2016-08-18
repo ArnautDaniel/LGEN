@@ -8,14 +8,8 @@
 ;bodylist -> list? or/c body?
 
 ;Sample Invoice
-(define a (invoice "Construction Zone" "Driver Baby" "Vallerie Rodriguez" "02-10-94"
-                   (list (body "Fire Hydrant"
-                               "2"
-                               "3")
-                         (body "Stop Sign"
-                               "3"
-                               "4"))))
 
+(define webserver-path (string-append (path->string (current-directory-for-user)) "htdocs"))
 ;Consumes a body structure and returns a unitrow for Tex
 (define (format-description inv)
   (string-join (list unitrow
@@ -24,7 +18,8 @@
                      (body-qty inv) "}{"
                      (body-price inv) "}{}") ""))
 
-
+(define (build-invoice-path inv)
+  (build-path webserver-path inv))
 ;Takes an invoice and builds the file name/path
 ;Performs string sanitation with string-join string-split so all whitespace
 ;removed properly
@@ -38,7 +33,11 @@
 ;Consumes an invoice name and adds ".tex" to it
 (define filename_invoice
   (lambda (inv)
-    (string-append (build_invoice_name a) ".tex")))
+    (string-append (build_invoice_name inv) ".tex")))
+
+(define filename_complete
+  (lambda (inv)
+    (build-invoice-path (string-append (build_invoice_name inv) ".pdf"))))
 
 ;Consumes a header constant and an invoice definition
 ;and returns a tex formatted string
@@ -53,7 +52,7 @@
     ;Generates Tex source code
     (define start_build
       (lambda (inv-name)
-        (call-with-output-file inv-name
+        (call-with-output-file (build-path webserver-path inv-name)
           (lambda (out)
             (display document_conf out)
             (newline out)
@@ -81,15 +80,18 @@
     ;Sends the built tex source to pdflatex after it is generated
     (define build_pdf
       (lambda (inv-name)
-        (system (string-join (list "pdflatex" inv-name)))
+        (system (string-join (list "pdflatex --output-directory" webserver-path " "
+                                   (path->string (build-invoice-path inv-name))
+                                     )))
+                             
         (cleanup_pdf inv)))
     (start_build (filename_invoice inv))))
 
 ;Consumes an invoice and deletes the log and aux files after the pdf is generated
 (define cleanup_pdf
   (lambda (inv)
-      (let ([aux (string-append (build_invoice_name inv) ".aux")]
-            [log (string-append (build_invoice_name inv) ".log")])
+      (let ([aux (build-invoice-path (string-append (build_invoice_name inv) ".aux"))]
+            [log (build-invoice-path (string-append (build_invoice_name inv) ".log"))])
         (delete-file aux)
         (delete-file log))))
 
@@ -109,8 +111,8 @@
 
 
 \\begin{document}")
-
-(define heading_conf "\\includegraphics[height=2.5cm,width=7cm]{caps.jpg} 
+;\\includegraphics[height=2.5cm,width=7cm]{caps.jpg} 
+(define heading_conf "
 \\hfil{\\huge\\color{red}{\\textsc{Checkout Sheet}}}\\hfil
 % \\bigskip\\break % Whitespace
 \\break
@@ -142,3 +144,4 @@ Norfolk, Georgia 00000 \\hfill anon@anon.com
 (define end_table "\\end{invoiceTable}")
 (define unitrow "\\unitrow{")
 
+(provide create_tex_invoice filename_invoice filename_complete)
