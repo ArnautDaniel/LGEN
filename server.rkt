@@ -1,6 +1,6 @@
 #lang racket
-(require "LGEN-model.rkt")
-(require "LGEN-generate.rkt")
+(require "model.rkt")
+(require "generate.rkt")
 (require web-server/formlets)
 (require web-server/servlet
          web-server/configuration/responders)
