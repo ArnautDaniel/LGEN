@@ -1,6 +1,6 @@
 #lang racket
-(require "model.rkt")
-(require "generate.rkt")
+(require "LGEN-model.rkt")
+(require "LGEN-generate.rkt")
 (require web-server/formlets)
 (require web-server/servlet
          web-server/configuration/responders)
@@ -34,10 +34,10 @@
                          (href "/skeleton.css")
                          (type "text/css"))))
             (body
-             (h1 "To produce a new document hit \"New Document\"")
+             (h1 "Welcome to CAPS Latex GENerator")
              (form ((action
                      ,(embed/url new-invoice-page)))
-                   (input ((type "submit"))))))))
+                   (input ((type "submit") (value "Create Document"))))))))
   (send/suspend/dispatch response-generator))
 ;Consumes a request and takes in data to send a struct invoice to
 ;the bodylist creation page
@@ -53,9 +53,10 @@
              (form ((action
                      ,(embed/url create-invoice)))
                    ,@(formlet-display invoice-basic-formlet)
-                   (input ((type "submit") (value "Ok"))))
+                   (input ((type "submit") (value "Create Invoice"))))
              (a ((href ,(embed/url render-home-page)))
                 "Back to Homepage")))))
+  
   (define (create-invoice request)
     (define-values (show set contact)
       (formlet-process invoice-basic-formlet request))
@@ -78,7 +79,7 @@
              (h2 "Contact: " ,(invoice-person a-invoice))
              (form ((action ,(embed/url insert-bodylist-handler)))
                    ,@(formlet-display bodylist-basic-formlet)
-                   (input ((type "submit") (value "Submit"))))
+                   (input ((type "submit") (value "Add Item"))))
              (form ((action ,(embed/url create-pdf-handler)))
                    (input ((type "submit") (value "Create PDF"))))
              (table
@@ -88,6 +89,7 @@
               (tb ,(render-bodylist a-invoice embed/url)))
              (a ((href ,(embed/url render-home-page)))
                 "Back to Homepage")))))
+  
   (define (insert-bodylist-handler request)
     (define-values (description qty price)
       (formlet-process bodylist-basic-formlet request))
@@ -113,9 +115,10 @@
 
 (define (serve-pdf a-invoice request)
   (response 200 #"OK" 0 #"application/pdf" empty (lambda (op)
-  (with-input-from-file (filename_complete a-invoice) (lambda ()
-                                                       (copy-port
-                                                        (current-input-port) op))))))
+                                                   (with-input-from-file
+                                                       (filename_complete a-invoice) (lambda ()
+                                                                                       (copy-port
+                                                                                        (current-input-port) op))))))
 (require web-server/servlet-env)
 (serve/servlet start
                #:launch-browser? #f
