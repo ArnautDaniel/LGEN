@@ -64,7 +64,7 @@
                    (input ((type "submit") (value "Create Invoice"))))
              (a ((href ,(embed/url render-home-page)))
                 "Back to Homepage")))))
-  
+
   (define (create-invoice request)
     (define-values (show set contact)
       (formlet-process invoice-basic-formlet request))
@@ -82,7 +82,7 @@
                   (link ((rel "stylesheet")
                          (href "/skeleton.css")
                          (type "text/css"))))
-            (body 
+            (body
              (h5 "Show: " ,(invoice-show a-invoice))
              (h5 "Set: " ,(invoice-set a-invoice))
              (h5 "Contact: " ,(invoice-person a-invoice))
@@ -98,19 +98,19 @@
               (tb ,(render-bodylist a-invoice embed/url)))
              (a ((href ,(embed/url render-home-page)))
                 "Back to Homepage")))))
-  
+
   (define (insert-bodylist-handler request)
     (define-values (description qty price)
       (formlet-process bodylist-basic-formlet request))
     (invoice-insert-bodylist! a-invoice description qty price)
     (create-bodylist-page a-invoice (redirect/get)))
-  
+
   (define (create-pdf-handler request)
     ;Send to generate.rkt
-    (create_tex_invoice a-invoice)
+    (create-tex-invoice a-invoice)
     ;Send generated pdf to client
     (serve-pdf a-invoice (redirect/get)))
-  
+
   (send/suspend/dispatch response-generator))
 
 ;For dynamically rendering already input body structures
@@ -131,7 +131,7 @@
   (response 200 #"OK" 0 #"application/pdf" empty
             (lambda (op)
               (with-input-from-file
-                  (filename_complete a-invoice)
+                  (filename-complete a-invoice)
                 (lambda ()
                   (copy-port
                    (current-input-port) op))))))
@@ -147,4 +147,3 @@
                (list (build-path (current-directory-for-user) "htdocs"))
                #:servlet-path
                "/servlet/app.rkt")
-

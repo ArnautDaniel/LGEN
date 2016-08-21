@@ -3,7 +3,7 @@
 (require "generate.rkt")
 (require "model.rkt")
 ;Where the PDF's need to be organized at
-(define root-directory "/home/silver/Desktop/Test")
+(define root-directory "/home/[USER]/Desktop/Test")
 
 (define sep "/")
 (define cur-directory root-directory)
@@ -20,7 +20,7 @@
   (string-join (list a sep b) ""))
 
 (define (organize-pdf a-invoice)
-  
+
   (define (check-directory-position a-show a-set)
     (cond
       ((directory-exists? (create-temp-dir-name (quick-join a-show a-set)))
@@ -29,13 +29,13 @@
        'noset)
       (else
        'noshow)))
-  
+
   (define (place-pdf a-show a-set)
     (copy-file
-     (filename_complete a-invoice)
+     (filename-complete a-invoice)
      (create-temp-dir-name
       (quick-join a-show
-                  (quick-join a-set (build_invoice_name a-invoice))))
+                  (quick-join a-set (build-invoice-name a-invoice))))
      #t))
   (letrec ([show (invoice-show a-invoice)]
            [set (invoice-set a-invoice)]

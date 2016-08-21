@@ -23,7 +23,7 @@
 ;Takes an invoice and builds the file name/path
 ;Performs string sanitation with string-join string-split so all whitespace
 ;removed properly
-(define build_invoice_name
+(define build-invoice-name
   (lambda (inv)
     (let ([showname (string-join (string-split (invoice-show inv) " ") "")]
           [setname (string-join (string-split (invoice-set inv) " ") "")]
@@ -31,13 +31,13 @@
       (string-join (list showname setname person) "_"))))
 
 ;Consumes an invoice name and adds ".tex" to it
-(define filename_invoice
+(define filename-invoice
   (lambda (inv)
-    (string-append (build_invoice_name inv) ".tex")))
+    (string-append (build-invoice-name inv) ".tex")))
 
-(define filename_complete
+(define filename-complete
   (lambda (inv)
-    (build-invoice-path (string-append (build_invoice_name inv) ".pdf"))))
+    (build-invoice-path (string-append (build-invoice-name inv) ".pdf"))))
 
 ;Consumes a header constant and an invoice definition
 ;and returns a tex formatted string
@@ -47,10 +47,10 @@
 
 ;Consumes an invoice structure and uses helper functions to put data into a Tex
 ;source document
-(define create_tex_invoice
+(define create-tex-invoice
   (lambda (inv)
     ;Generates Tex source code
-    (define start_build
+    (define start-build
       (lambda (inv-name)
         (call-with-output-file (build-path webserver-path inv-name)
           (lambda (out)
@@ -74,25 +74,25 @@
             (newline out)
             (display tail_conf out))
           #:exists 'replace)
-        
+
         (build_pdf inv-name)))
-   
+
     ;Sends the built tex source to pdflatex after it is generated
     (define build_pdf
       (lambda (inv-name)
         (system (string-join (list "pdflatex --output-directory" webserver-path " "
                                    (path->string (build-invoice-path inv-name))
                                      )))
-                             
-        (cleanup_pdf inv)))
-    (start_build (filename_invoice inv))))
+
+        (cleanup-pdf inv)))
+    (start-build (filename-invoice inv))))
 
 ;Consumes an invoice and deletes the log and aux files after the pdf is generated
-(define cleanup_pdf
+(define cleanup-pdf
   (lambda (inv)
-      (let ([aux (build-invoice-path (string-append (build_invoice_name inv) ".aux"))]
-            [log (build-invoice-path (string-append (build_invoice_name inv) ".log"))]
-            [tex (build-invoice-path (string-append (build_invoice_name inv) ".tex"))])
+      (let ([aux (build-invoice-path (string-append (build-invoice-name inv) ".aux"))]
+            [log (build-invoice-path (string-append (build-invoice-name inv) ".log"))]
+            [tex (build-invoice-path (string-append (build-invoice-name inv) ".tex"))])
         (delete-file aux)
         (delete-file log)
         (delete-file tex))))
@@ -113,7 +113,7 @@
 
 
 \\begin{document}")
-;\\includegraphics[height=2.5cm,width=7cm]{caps.jpg} 
+;\\includegraphics[height=2.5cm,width=7cm]{caps.jpg}
 (define heading_conf "
 \\hfil{\\huge\\color{red}{\\textsc{Checkout Sheet}}}\\hfil
 % \\bigskip\\break % Whitespace
@@ -122,7 +122,7 @@
 
 000 E Atlanta Drive \\hfill \\emph{Mobile:} (000) 000-0000 \\\\
 Ste. 000 \\hfill{ \\emph{Office:} (000) 000-0000} \\\\
-% Your address and contact information	
+% Your address and contact information
 Norfolk, Georgia 00000 \\hfill anon@anon.com
 \\\\ \\\\
 {\\bf Invoice To:} \\\\ % From here --->")
@@ -146,4 +146,4 @@ Norfolk, Georgia 00000 \\hfill anon@anon.com
 (define end_table "\\end{invoiceTable}")
 (define unitrow "\\unitrow{")
 
-(provide create_tex_invoice filename_invoice filename_complete build_invoice_name)
+(provide create-tex-invoice filename-invoice filename-complete build-invoice-name)
