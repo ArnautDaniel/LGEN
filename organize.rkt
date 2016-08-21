@@ -1,7 +1,8 @@
 #lang racket
+;This code may make small babies cry
 (require "generate.rkt")
 (require "model.rkt")
-
+;Where the PDF's need to be organized at
 (define root-directory "/home/[USER]/Desktop/Test")
 
 (define sep "/")
@@ -14,13 +15,13 @@
 (define (create-temp-dir-name dir)
   (string->path (string-join (list root-directory sep dir) "")))
 
+;For building filepaths quickly
 (define (quick-join a b)
   (string-join (list a sep b) ""))
 
 (define (organize-pdf a-invoice)
   
   (define (check-directory-position a-show a-set)
-    
     (cond
       ((directory-exists? (create-temp-dir-name (quick-join a-show a-set)))
        #t)
@@ -45,12 +46,12 @@
        #t)
       ((equal? modeset 'noset)
        (make-directory (create-temp-dir-name (quick-join show set)))
-       (organize-pdf a-invoice))
+       (place-pdf show set))
       ((equal? modeset 'noshow)
        (make-directory (create-temp-dir-name show))
        (make-directory (create-temp-dir-name (quick-join show set)))
-       (organize-pdf a-invoice))
-      (else
-       #f))))
+       (place-pdf show set))
+      (else #f))))
 
 (provide organize-pdf)
+;I cried
