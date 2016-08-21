@@ -2,12 +2,12 @@ LGEN is a simple invoice creator webapp written in Racket.  It takes invoice dat
 
 +Uses Skeleton CSS
 
++Organizes PDFS into a directory of the user's choosing
+
 TODO:
 
 +Add Database Backend
 
-+Comment server.rkt fully
++Cleanup and Comment
 
-+Cleanup
-
-Current Version - 0.1.1
+Current Version - 0.2.0
