@@ -1,7 +1,8 @@
 #lang racket
 
-(require "model.rkt")
-(require "generate.rkt")
+(require "model.rkt"
+         "generate.rkt"
+         "organize.rkt")
 (require web-server/formlets)
 (require web-server/servlet
          web-server/configuration/responders
@@ -67,7 +68,7 @@
   (define (create-invoice request)
     (define-values (show set contact)
       (formlet-process invoice-basic-formlet request))
-    (create-bodylist-page (invoice show set contact "00" '()) (redirect/get)))
+    (create-bodylist-page (invoice set show contact "00" '()) (redirect/get)))
   (send/suspend/dispatch response-generator))
 
 ;Input details for invoice-bodylist list/of? body structures
@@ -126,6 +127,7 @@
 
 ;Construct a request to send the currently generated PDF to Client
 (define (serve-pdf a-invoice request)
+  (organize-pdf a-invoice)
   (response 200 #"OK" 0 #"application/pdf" empty
             (lambda (op)
               (with-input-from-file
@@ -139,8 +141,8 @@
 (serve/servlet start
                #:launch-browser? #f
                #:quit? #f
-               #:listen-ip "192.168.1.78"
-               #:port 8000
+               #:listen-ip "10.0.0.12"
+               #:port 8080
                #:extra-files-paths
                (list (build-path (current-directory-for-user) "htdocs"))
                #:servlet-path

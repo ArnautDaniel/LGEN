@@ -144,4 +144,4 @@ Norfolk, Georgia 00000 \\hfill anon@anon.com
 (define end_table "\\end{invoiceTable}")
 (define unitrow "\\unitrow{")
 
-(provide create_tex_invoice filename_invoice filename_complete)
+(provide create_tex_invoice filename_invoice filename_complete build_invoice_name)
