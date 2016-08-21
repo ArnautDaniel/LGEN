@@ -91,9 +91,11 @@
 (define cleanup_pdf
   (lambda (inv)
       (let ([aux (build-invoice-path (string-append (build_invoice_name inv) ".aux"))]
-            [log (build-invoice-path (string-append (build_invoice_name inv) ".log"))])
+            [log (build-invoice-path (string-append (build_invoice_name inv) ".log"))]
+            [tex (build-invoice-path (string-append (build_invoice_name inv) ".tex"))])
         (delete-file aux)
-        (delete-file log))))
+        (delete-file log)
+        (delete-file tex))))
 
 ;General document constants
 (define document_conf "\\documentclass{invoice} % Use the custom invoice class (invoice.cls)
