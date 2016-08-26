@@ -26,17 +26,26 @@
                " (id INTEGER PRIMARY KEY, nameSet TEXT, item TEXT, price INTEGER, qty INTEGER)")))
 
 (define (insert-invoice-data! lgen-path a-invoice)
+  (define (insert-bodylist-data! a-bodylist)
+    (cond
+      ((not (pair? a-bodylist)) #t)
+      ((empty? a-bodylist) #t)
+      (else
+       (query-exec db
+                   (string-append
+                    "INSERT INTO " (clean-show-name (invoice-show a-invoice))
+                    "(nameSet, item, price, qty) VALUES (?, ?, ?, ?)")
+                   (invoice-set a-invoice)
+                   (body-description (car a-bodylist))
+                   (body-price (car a-bodylist))
+                   (body-qty (car a-bodylist)))
+       (insert-bodylist-data! (cdr a-bodylist)))))
+    
   (unless (table-exists? db (clean-show-name (invoice-show a-invoice)))
     (init-invoice! a-invoice))
-  (query-exec db
-              (string-append
-               "INSERT INTO " (clean-show-name (invoice-show a-invoice))
-               "(nameSet, item, price, qty) VALUES (?, ?, ?, ?)")
-               (invoice-set a-invoice)
-               (body-description (car (invoice-bodylist a-invoice)))
-               (body-price (car (invoice-bodylist a-invoice)))
-               (body-qty (car (invoice-bodylist a-invoice)))))
+  (insert-bodylist-data! (invoice-bodylist a-invoice)))
   
+ 
   ;Define formlet for item input
   (define bodylist-basic-formlet
   (formlet

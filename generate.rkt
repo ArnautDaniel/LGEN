@@ -95,7 +95,7 @@
             [tex (build-invoice-path (string-append (build-invoice-name inv) ".tex"))])
         (delete-file aux)
         (delete-file log)
-        )))
+        (delete-file tex))))
 
 ;General document constants
 (define document_conf "\\documentclass{invoice} % Use the custom invoice class (invoice.cls)
