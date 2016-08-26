@@ -8,8 +8,10 @@ LGEN is a simple invoice creator webapp written in Racket.  It takes invoice dat
 
 TODO:
 
-+Add Database Backend
++Add Database Backend (Initial Sqlite3 backend and scheme, some helper functions implemented)
 
 +Cleanup and Comment
 
-Current Version - 0.2.1
++Refactor like hell
+
+Current Version - 0.2.5
