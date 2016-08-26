@@ -3,15 +3,42 @@
 (require "model.rkt"
          "generate.rkt"
          "organize.rkt")
-(require web-server/formlets)
-(require web-server/servlet
+
+(require web-server/formlets
+         web-server/servlet
          web-server/configuration/responders
-         web-server/servlet-env)
+         web-server/servlet-env
+         db)
 
 (provide/contract (start (request? . -> . response?)))
+(define lgen-path "/home/silver/Desktop/lgen/lgen.db")
+(define db (sqlite3-connect #:database lgen-path #:mode 'create))
 
-;Define formlet for item input
-(define bodylist-basic-formlet
+(define (clean-show-name a-showname)
+  (string-join (string-split a-showname " ") ""))
+
+;init-invoice! : path? invoice? ->
+
+(define (init-invoice! a-invoice)
+  (query-exec db
+              (string-append
+               "CREATE TABLE " (clean-show-name (invoice-show a-invoice))
+               " (id INTEGER PRIMARY KEY, nameSet TEXT, item TEXT, price INTEGER, qty INTEGER)")))
+
+(define (insert-invoice-data! lgen-path a-invoice)
+  (unless (table-exists? db (clean-show-name (invoice-show a-invoice)))
+    (init-invoice! a-invoice))
+  (query-exec db
+              (string-append
+               "INSERT INTO " (clean-show-name (invoice-show a-invoice))
+               "(nameSet, item, price, qty) VALUES (?, ?, ?, ?)")
+               (invoice-set a-invoice)
+               (body-description (car (invoice-bodylist a-invoice)))
+               (body-price (car (invoice-bodylist a-invoice)))
+               (body-qty (car (invoice-bodylist a-invoice)))))
+  
+  ;Define formlet for item input
+  (define bodylist-basic-formlet
   (formlet
    (div "Item Description: " ,{input-string . => . description}
         "Quantity: " ,{input-string . => . qty}
@@ -64,7 +91,7 @@
                    (input ((type "submit") (value "Create Invoice"))))
              (a ((href ,(embed/url render-home-page)))
                 "Back to Homepage")))))
-
+  
   (define (create-invoice request)
     (define-values (show set contact)
       (formlet-process invoice-basic-formlet request))
@@ -98,19 +125,19 @@
               (tb ,(render-bodylist a-invoice embed/url)))
              (a ((href ,(embed/url render-home-page)))
                 "Back to Homepage")))))
-
+  
   (define (insert-bodylist-handler request)
     (define-values (description qty price)
       (formlet-process bodylist-basic-formlet request))
     (invoice-insert-bodylist! a-invoice description qty price)
     (create-bodylist-page a-invoice (redirect/get)))
-
+  
   (define (create-pdf-handler request)
     ;Send to generate.rkt
     (create-tex-invoice a-invoice)
     ;Send generated pdf to client
     (serve-pdf a-invoice (redirect/get)))
-
+  
   (send/suspend/dispatch response-generator))
 
 ;For dynamically rendering already input body structures
@@ -128,6 +155,7 @@
 ;Construct a request to send the currently generated PDF to Client
 (define (serve-pdf a-invoice request)
   (organize-pdf a-invoice)
+  (insert-invoice-data! lgen-path a-invoice)
   (response 200 #"OK" 0 #"application/pdf" empty
             (lambda (op)
               (with-input-from-file
@@ -141,7 +169,7 @@
 (serve/servlet start
                #:launch-browser? #f
                #:quit? #f
-               #:listen-ip "10.0.0.12"
+               #:listen-ip #f
                #:port 8080
                #:extra-files-paths
                (list (build-path (current-directory-for-user) "htdocs"))

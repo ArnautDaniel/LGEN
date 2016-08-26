@@ -3,7 +3,7 @@
 (require "generate.rkt")
 (require "model.rkt")
 ;Where the PDF's need to be organized at
-(define root-directory "/home/[USER]/Desktop/Test")
+(define root-directory "/home/silver/Desktop/Test")
 
 (define sep "/")
 (define cur-directory root-directory)

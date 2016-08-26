@@ -95,7 +95,7 @@
             [tex (build-invoice-path (string-append (build-invoice-name inv) ".tex"))])
         (delete-file aux)
         (delete-file log)
-        (delete-file tex))))
+        )))
 
 ;General document constants
 (define document_conf "\\documentclass{invoice} % Use the custom invoice class (invoice.cls)
@@ -146,4 +146,5 @@ Norfolk, Georgia 00000 \\hfill anon@anon.com
 (define end_table "\\end{invoiceTable}")
 (define unitrow "\\unitrow{")
 
-(provide create-tex-invoice filename-invoice filename-complete build-invoice-name)
+(provide create-tex-invoice filename-invoice filename-complete
+         build-invoice-name webserver-path)
