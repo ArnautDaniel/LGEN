@@ -92,7 +92,12 @@
              (h3 "Welcome to CAPS Latex GENerator")
              (form ((action
                      ,(embed/url new-invoice-page)))
-                   (input ((type "submit") (value "Create Document"))))))))
+                   (input ((type "submit") (value "Create Document"))))
+             (form ((action
+                     ,(embed/url items-out-handler)))
+                   (input ((type "submit") (value "View Items Out"))))))))
+  (define (items-out-handler request)
+    (items-out-page (redirect/get)))
   (send/suspend/dispatch response-generator))
 
 ;Consumes a request and takes in data to send a struct invoice to
@@ -117,6 +122,19 @@
     (define-values (show set contact)
       (formlet-process invoice-basic-formlet request))
     (create-bodylist-page (invoice set show contact "00" '()) (redirect/get)))
+  (send/suspend/dispatch response-generator))
+
+(define (items-out-page request)
+  (define (response-generator embed/url)
+    (response/xexpr
+     `(html (head (title "View Items Out")
+                  (link ((rel "stylesheet")
+                         (href "/skeleton.css")
+                         (type "text/css"))))
+            (body
+           (h3 "View Items Out")
+           (a ((href ,(embed/url render-home-page)))
+              "Back to Homepage")))))
   (send/suspend/dispatch response-generator))
 
 ;Input details for invoice-bodylist list/of? body structures
