@@ -19,5 +19,6 @@
 (provide invoice invoice? invoice-set invoice-show invoice-person invoice-date
          invoice-bodylist initialize-invoice!
          body body? body-description body-qty body-price
-         invoice-insert-bodylist!)
+         invoice-insert-bodylist! set-invoice-show! set-invoice-set!
+         set-invoice-person! set-invoice-date! )
 
